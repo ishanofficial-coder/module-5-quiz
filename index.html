@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Module 5: Graphics & Multimedia Master Quiz (100 Questions)</title>
+    <title>Module 5: Graphics & Multimedia Master Quiz</title>
     <style>
         * {
             box-sizing: border-box;
@@ -170,22 +170,61 @@
             opacity: 0.6;
         }
 
-        .result-screen {
-            text-align: center;
+        /* Start / Name Screen Style */
+        .screen {
             display: none;
         }
 
-        .result-screen h2 {
-            font-size: 2rem;
+        .screen.active {
+            display: block;
+        }
+
+        .input-group {
+            margin: 20px 0;
+            text-align: left;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #94a3b8;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 12px 16px;
+            border-radius: 8px;
+            border: 1px solid #475569;
+            background: #0f172a;
+            color: white;
+            font-size: 1rem;
+        }
+
+        /* Leaderboard Style */
+        .leaderboard-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            margin-bottom: 25px;
+        }
+
+        .leaderboard-table th, .leaderboard-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #334155;
+        }
+
+        .leaderboard-table th {
+            background: #0f172a;
             color: #38bdf8;
-            margin-bottom: 15px;
         }
 
         .score-display {
-            font-size: 3rem;
+            font-size: 2.5rem;
             font-weight: bold;
             color: #22c55e;
-            margin: 20px 0;
+            margin: 15px 0;
+            text-align: center;
         }
 
         .btn-restart {
@@ -202,10 +241,24 @@
 <body>
 
     <div class="quiz-container">
-        <!-- Quiz Interface -->
-        <div id="quiz-screen">
+        
+        <!-- Start / Player Name Screen -->
+        <div id="start-screen" class="screen active" style="text-align: center;">
+            <h1 style="color: #38bdf8; margin-bottom: 10px;">Module 5 Master Quiz</h1>
+            <p style="color: #94a3b8;">100 Questions • Multi & Single Choice • Global Leaderboard</p>
+            
+            <div class="input-group">
+                <label for="player-name">Enter Your Name for the Leaderboard:</label>
+                <input type="text" id="player-name" placeholder="E.g., John Doe" maxlength="25">
+            </div>
+
+            <button class="btn-action" style="width: 100%; margin-top: 10px;" onclick="startQuiz()">Start Quiz</button>
+        </div>
+
+        <!-- Quiz Screen -->
+        <div id="quiz-screen" class="screen">
             <div class="header">
-                <h1>Graphics & Multimedia (Module 5) Quiz</h1>
+                <h1>Module 5: Graphics & Multimedia</h1>
                 <span class="badge" id="question-count">Question 1 / 100</span>
             </div>
 
@@ -214,7 +267,7 @@
             </div>
 
             <div class="instruction-note" id="instruction-note">
-                ℹ️ Select all correct options (1, 2, or 3 correct answers) and click "Submit Answer".
+                ℹ️ Select the correct answer(s) and click "Submit Answer".
             </div>
 
             <div class="question-text" id="question-text">
@@ -231,176 +284,161 @@
             </div>
         </div>
 
-        <!-- Result Interface -->
-        <div id="result-screen" class="result-screen">
+        <!-- Result & Global Leaderboard Screen -->
+        <div id="result-screen" class="screen" style="text-align: center;">
             <h2>🎉 Quiz Completed!</h2>
-            <p style="color: #94a3b8;">You have completed all 100 questions.</p>
             <div class="score-display" id="final-score">0 / 100</div>
-            <p id="feedback-text" style="margin-bottom: 25px; font-size: 1.1rem;"></p>
+            
+            <h3 style="color: #38bdf8; margin-top: 30px; text-align: left;">🏆 Global Leaderboard (Top 10)</h3>
+            <table class="leaderboard-table">
+                <thead>
+                    <tr>
+                        <th>Rank</th>
+                        <th>Name</th>
+                        <th>Score</th>
+                    </tr>
+                </thead>
+                <tbody id="leaderboard-body">
+                    <tr><td colspan="3">Loading Leaderboard...</td></tr>
+                </tbody>
+            </table>
+
             <button class="btn-restart" onclick="restartQuiz()">Try Again</button>
         </div>
+
     </div>
 
+    <!-- Firebase Script (Modular SDK v9+) -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getDatabase, ref, push, onValue, query, orderByChild, limitToLast } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyB1xZFuM-l6Fq7LrXl4JIcAaT0DhtCOyCI",
+            authDomain: "module5quiz.firebaseapp.com",
+            databaseURL: "https://module5quiz-default-rtdb.firebaseio.com",
+            projectId: "module5quiz",
+            storageBucket: "module5quiz.firebasestorage.app",
+            messagingSenderId: "611717318524",
+            appId: "1:611717318524:web:e4ae2a5689a309a9ce86f9",
+            measurementId: "G-WJX7N44KBS"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+
+        // Make Firebase functions available globally
+        window.db = db;
+        window.dbRef = ref;
+        window.dbPush = push;
+        window.dbOnValue = onValue;
+        window.dbQuery = query;
+        window.dbOrderByChild = orderByChild;
+        window.dbLimitToLast = limitToLast;
+    </script>
+
     <script>
-        // 100 Comprehensive Module 5 Questions (Including Mock Exam 5 Questions)
-        // 'c' contains array of 0-based indices of CORRECT options
+        let playerName = "Anonymous";
+
+        // 100 Mixed Questions (Single Choice & Multiple Choice)
         const rawQuizData = [
-            // Mock Exam 5 Questions
+            // Mock Exam 5 - Single & Multi Options
             {
                 q: "What type of editing does VN Video Editor allow using multiple layers of video and audio?",
-                a: ["Multi-track editing", "Layered editing", "Non-linear timeline editing", "Single-track linear editing"],
-                c: [0, 1, 2]
+                a: ["Multi-track / Layered editing", "Single-track linear editing", "Audio-only editing", "Text-only editing"],
+                c: [0] // Single choice
             },
             {
-                q: "In Canva, what feature allows multiple people to work on the same design at the same time?",
+                q: "In Canva, what features allow multiple people to work on the same design at the same time?",
                 a: ["Real-time collaboration", "Team sharing links", "Single-user lock mode", "Offline export mode"],
-                c: [0, 1]
+                c: [0, 1] // Multi choice
             },
             {
                 q: "In Filmora, what tool helps you control how loud or soft an audio clip plays over time?",
-                a: ["Volume Keyframes", "Audio Envelope / Fade Handles", "Audio Equalizer", "Crop Tool"],
+                a: ["Volume Keyframes", "Crop Tool", "Aspect Ratio Tool", "Speed Ramp"],
+                c: [0]
+            },
+            {
+                q: "What export resolutions are commonly used in VN Video Editor for vertical social media platforms?",
+                a: ["1080p (1080 x 1920)", "720p (720 x 1280)", "4K Horizontal", "240p Standard"],
                 c: [0, 1]
             },
             {
-                q: "What export resolution is commonly used in VN Video Editor for social media platforms like Instagram or TikTok?",
-                a: ["1080p (1080 x 1920)", "720p (720 x 1280)", "4K Vertical", "240p Standard"],
-                c: [0, 1]
-            },
-            {
-                q: "What makes VN Video Editor suitable for mobile content creators on phones and tablets?",
-                a: ["No watermark on free exports", "User-friendly touch interface", "Full multi-layer editing features", "Requires a heavy paid subscription for basic features"],
+                q: "What makes VN Video Editor suitable for mobile content creators?",
+                a: ["No watermark on free exports", "User-friendly touch interface", "Full multi-layer timeline features", "Requires paid subscription"],
                 c: [0, 1, 2]
             },
             {
                 q: "In Suno AI, what happens when you regenerate a song using the same prompt?",
-                a: ["It creates new variation with different melody & arrangement", "It generates distinct vocals while keeping the prompt style", "It outputs an exact duplicate audio file", "It deletes previous tracks permanently"],
-                c: [0, 1]
+                a: ["It creates a new variation with different melody & arrangement", "It outputs an exact duplicate file", "It deletes previous tracks", "It locks the lyrics"],
+                c: [0]
             },
             {
-                q: "In Runway ML, which tool is used to remove objects or people from a video?",
-                a: ["Inpainting tool", "Inpainting Brush", "Text-to-Video tool", "Motion Brush"],
+                q: "In Runway ML, which tools are used to remove objects or people from a video?",
+                a: ["Inpainting tool", "Inpainting Brush", "Text-to-Video tool", "Audio Equalizer"],
                 c: [0, 1]
             },
             {
                 q: "In Filmora, which panel is used to store all imported videos, images, and audio files?",
-                a: ["Media Library / Media Panel", "Project Media Panel", "Effects Library", "Properties Window"],
-                c: [0, 1]
+                a: ["Media Library / Media Panel", "Effects Library", "Export Window", "Color Wheel"],
+                c: [0]
             },
             {
                 q: "In Canva, which panel contains stickers, icons, shapes, and illustrations?",
-                a: ["Elements Panel", "Graphics & Assets tab", "Uploads tab", "Text Styles tab"],
-                c: [0, 1]
+                a: ["Elements Panel", "Uploads tab", "Text tab", "Draw tab"],
+                c: [0]
             },
             {
                 q: "In Deep Dream Generator, why is uploading a clear, high-quality photo important?",
-                a: ["It allows the neural network to extract sharp structural features", "It prevents pixelation and artifacts in the AI styled output", "It reduces the render credit cost to zero", "It automatically converts 2D images to 3D models"],
-                c: [0, 1]
-            },
-
-            // Software Platform Requirements & Installation
-            {
-                q: "Which options correctly describe the setup requirements for running VN Video Editor on a Windows 11 PC?",
-                a: ["Requires an Android Emulator (e.g., BlueStacks)", "Can run natively inside Android subsystem/emulator environment", "Installs directly via standard standalone Windows EXE installer without third-party tools", "Runs strictly as a web application in Chrome browser"],
-                c: [0, 1]
-            },
-            {
-                q: "Which statements are TRUE regarding Filmora's free version limitations?",
-                a: ["Applies a prominent Filmora watermark on exported videos", "Provides access to most timeline editing tools", "Limits video export duration to maximum 15 seconds", "Removes audio completely from exported MP4 files"],
-                c: [0, 1]
-            },
-            {
-                q: "What native project file extensions are used by Wondershare Filmora?",
-                a: [".wfp (Wondershare Filmora Project)", ".mp4", ".mov", ".png"],
-                c: [0]
-            },
-
-            // AI Video Generation (Runway ML)
-            {
-                q: "Which components form the official Golden Prompt Formula in Runway ML?",
-                a: ["[Subject]", "[Action]", "[Style]", "[Camera]"],
-                c: [0, 1, 2, 3]
-            },
-            {
-                q: "What primary functionalities does Runway ML Gen-2 and Gen-3 offer?",
-                a: ["Text-to-Video generation", "Image-to-Video generation", "Motion control via Motion Brush", "Full multitrack DAW audio mastering"],
-                c: [0, 1, 2]
-            },
-
-            // AI Music Generation (Suno AI)
-            {
-                q: "What features are accessible in Suno AI's Custom Mode?",
-                a: ["Inputting user-written custom lyrics", "Selecting specific musical genres and styles", "Setting custom song titles", "Exporting 3D CAD mesh models"],
-                c: [0, 1, 2]
-            },
-            {
-                q: "What structure tags are validly used to organize lyrics in Suno AI?",
-                a: ["[Verse]", "[Chorus]", "[Bridge]", "<script>"],
-                c: [0, 1, 2]
-            },
-
-            // AI Image & Style Generation (Deep Dream & Midjourney)
-            {
-                q: "What is the primary role of a Negative Prompt in AI art generators like Deep Dream or Midjourney?",
-                a: ["Excluding unwanted objects or defects", "Preventing text/watermarks from appearing", "Increasing dark mood lighting automatically", "Reducing export file resolution"],
+                a: ["Allows neural network to extract sharp structural features", "Prevents pixelation in AI output", "Reduces credit cost to zero", "Converts 2D to 3D"],
                 c: [0, 1]
             }
         ];
 
-        // Fill remaining questions programmatically to reach exactly 100 high-quality questions
-        const multimediaTopics = [
-            "Vector Graphics vs Raster Graphics", "Color Models (RGB vs CMYK)", "Audio Formats (MP3 vs WAV vs FLAC)",
-            "Video Frame Rates (24fps vs 30fps vs 60fps)", "Canva Export Formats (PNG, PDF Print, SVG)",
-            "Filmora Color Grading & LUTs", "VN Keyframe Animations", "Audio Noise Reduction Techniques"
+        // Fill remaining questions to make 100 questions with mixed Single/Multi choices
+        const topics = [
+            "Vector vs Raster", "Color Models (RGB/CMYK)", "Audio Formats (MP3/WAV)",
+            "Video Frame Rates", "Canva Export Formats", "Filmora Keyframes", "Runway AI Motion"
         ];
 
         while (rawQuizData.length < 100) {
             let num = rawQuizData.length + 1;
-            let topic = multimediaTopics[num % multimediaTopics.length];
-            
-            if (num % 3 === 0) {
+            let topic = topics[num % topics.length];
+
+            if (num % 2 === 0) {
+                // Single Choice Question
                 rawQuizData.push({
-                    q: `[Q${num}] Which statements are CORRECT regarding ${topic} in multimedia production?`,
+                    q: `[Q${num}] What is the primary characteristic of ${topic}?`,
                     a: [
-                        `It plays a crucial role in digital media quality and optimization.`,
-                        `Choosing correct settings prevents loss of quality during rendering.`,
-                        `It is completely obsolete in modern graphic and video editing workflows.`,
-                        `It applies exclusively to text-only document formatting.`
+                        `It provides standardized quality control in graphics/multimedia workflows.`,
+                        `It degrades video resolution completely upon export.`,
+                        `It is exclusively supported by offline analog hardware.`,
+                        `It removes all layer information permanently.`
                     ],
-                    c: [0, 1]
-                });
-            } else if (num % 3 === 1) {
-                rawQuizData.push({
-                    q: `[Q${num}] What advantages does utilizing ${topic} provide to content creators?`,
-                    a: [
-                        `Enhanced visual or auditory clarity in output files.`,
-                        `Improved control over overall post-production workflow.`,
-                        `Automatic legal copyright ownership without licensing.`,
-                        `Eliminates the requirement for hardware GPU acceleration.`
-                    ],
-                    c: [0, 1]
+                    c: [0]
                 });
             } else {
+                // Multiple Choice Question
                 rawQuizData.push({
-                    q: `[Q${num}] Which format or property is associated with ${topic}?`,
+                    q: `[Q${num}] Which statements are CORRECT regarding ${topic}?`,
                     a: [
-                        `Standard digital media industry specifications.`,
-                        `Direct compatibility with graphic editing tools like Canva and Filmora.`,
-                        `Lossy compression algorithms only.`,
-                        `Analog magnetic tape recording.`
+                        `Proper configuration prevents quality loss during export.`,
+                        `It plays a key role in digital asset optimization.`,
+                        `It is completely obsolete in modern graphic design.`,
+                        `It requires deleting the project source files.`
                     ],
                     c: [0, 1]
                 });
             }
         }
 
-        // Shuffle options for each question so correct answers aren't fixed at position 0
+        // Shuffle options dynamically for each question
         const quizData = rawQuizData.map(item => {
             let optionsWithOriginalIndices = item.a.map((optText, origIdx) => ({
                 text: optText,
                 isCorrect: item.c.includes(origIdx)
             }));
 
-            // Fisher-Yates Shuffle for options
             for (let i = optionsWithOriginalIndices.length - 1; i > 0; i--) {
                 const j = Math.floor(Math.random() * (i + 1));
                 [optionsWithOriginalIndices[i], optionsWithOriginalIndices[j]] = [optionsWithOriginalIndices[j], optionsWithOriginalIndices[i]];
@@ -415,19 +453,33 @@
             };
         });
 
-        // App State
+        // App Variables
         let currentIndex = 0;
         let score = 0;
         let selectedIndices = [];
         let isSubmitted = false;
 
-        // Elements
+        const startScreen = document.getElementById("start-screen");
+        const quizScreen = document.getElementById("quiz-screen");
+        const resultScreen = document.getElementById("result-screen");
+
         const questionTextEl = document.getElementById("question-text");
         const optionsContainerEl = document.getElementById("options-container");
         const questionCountEl = document.getElementById("question-count");
         const progressBarEl = document.getElementById("progress-bar");
         const actionBtn = document.getElementById("action-btn");
         const scoreTrackerEl = document.getElementById("score-tracker");
+        const instructionNote = document.getElementById("instruction-note");
+
+        function startQuiz() {
+            const inputVal = document.getElementById("player-name").value.trim();
+            if (inputVal !== "") {
+                playerName = inputVal;
+            }
+            startScreen.classList.remove("active");
+            quizScreen.classList.add("active");
+            loadQuestion();
+        }
 
         function loadQuestion() {
             isSubmitted = false;
@@ -438,6 +490,13 @@
             questionCountEl.innerText = `Question ${currentIndex + 1} / ${quizData.length}`;
             progressBarEl.style.width = `${((currentIndex + 1) / quizData.length) * 100}%`;
             
+            // Instruction update based on single or multi choice
+            if (q.correctIndices.length === 1) {
+                instructionNote.innerText = "ℹ️ Single Choice: Select the 1 correct answer.";
+            } else {
+                instructionNote.innerText = `ℹ️ Multiple Choice: Select ALL ${q.correctIndices.length} correct answers.`;
+            }
+
             optionsContainerEl.innerHTML = "";
             actionBtn.innerText = "Submit Answer";
             actionBtn.disabled = true;
@@ -454,13 +513,23 @@
         function toggleOption(index, btnEl) {
             if (isSubmitted) return;
 
-            const pos = selectedIndices.indexOf(index);
-            if (pos > -1) {
-                selectedIndices.splice(pos, 1);
-                btnEl.classList.remove("selected");
-            } else {
-                selectedIndices.push(index);
+            const q = quizData[currentIndex];
+
+            // If single choice, allow picking only one at a time
+            if (q.correctIndices.length === 1) {
+                selectedIndices = [index];
+                Array.from(optionsContainerEl.children).forEach(child => child.classList.remove("selected"));
                 btnEl.classList.add("selected");
+            } else {
+                // Multi-choice toggle
+                const pos = selectedIndices.indexOf(index);
+                if (pos > -1) {
+                    selectedIndices.splice(pos, 1);
+                    btnEl.classList.remove("selected");
+                } else {
+                    selectedIndices.push(index);
+                    btnEl.classList.add("selected");
+                }
             }
 
             actionBtn.disabled = selectedIndices.length === 0;
@@ -468,12 +537,10 @@
 
         function handleAction() {
             if (!isSubmitted) {
-                // Submit Answer Step
                 isSubmitted = true;
                 const q = quizData[currentIndex];
                 const optionButtons = optionsContainerEl.children;
 
-                // Check if user selection exactly matches correct indices
                 const isExactMatch = selectedIndices.length === q.correctIndices.length &&
                     selectedIndices.every(val => q.correctIndices.includes(val));
 
@@ -482,7 +549,6 @@
                     scoreTrackerEl.innerText = `Score: ${score}`;
                 }
 
-                // Render Correct / Wrong Styles
                 q.options.forEach((_, idx) => {
                     const btn = optionButtons[idx];
                     btn.style.pointerEvents = "none";
@@ -499,7 +565,6 @@
 
                 actionBtn.innerText = currentIndex === quizData.length - 1 ? "Show Final Result" : "Next Question";
             } else {
-                // Next Question Step
                 currentIndex++;
                 if (currentIndex < quizData.length) {
                     loadQuestion();
@@ -510,37 +575,75 @@
         }
 
         function showResults() {
-            document.getElementById("quiz-screen").style.display = "none";
-            document.getElementById("result-screen").style.display = "block";
+            quizScreen.classList.remove("active");
+            resultScreen.classList.add("active");
             
             document.getElementById("final-score").innerText = `${score} / ${quizData.length}`;
-            
-            const feedback = document.getElementById("feedback-text");
-            const percentage = (score / quizData.length) * 100;
 
-            if (percentage >= 80) {
-                feedback.innerText = "🌟 Excellent! You have mastered Module 5!";
-                feedback.style.color = "#22c55e";
-            } else if (percentage >= 50) {
-                feedback.innerText = "👍 Good job! A quick revision will make it 100%.";
-                feedback.style.color = "#38bdf8";
-            } else {
-                feedback.innerText = "📚 Review the module PDFs and try again!";
-                feedback.style.color = "#f43f5e";
+            // Save Score to Firebase
+            saveScoreToFirebase(playerName, score);
+
+            // Fetch and display Leaderboard
+            fetchLeaderboard();
+        }
+
+        function saveScoreToFirebase(name, scoreValue) {
+            if (window.db) {
+                const scoresRef = window.dbRef(window.db, "leaderboard");
+                window.dbPush(scoresRef, {
+                    name: name,
+                    score: scoreValue,
+                    timestamp: Date.now()
+                });
             }
+        }
+
+        function fetchLeaderboard() {
+            if (window.db) {
+                const scoresRef = window.dbRef(window.db, "leaderboard");
+                const topScoresQuery = window.dbQuery(scoresRef, window.dbOrderByChild("score"), window.dbLimitToLast(10));
+
+                window.dbOnValue(topScoresQuery, (snapshot) => {
+                    const tbody = document.getElementById("leaderboard-body");
+                    tbody.innerHTML = "";
+
+                    let scoresList = [];
+                    snapshot.forEach((childSnapshot) => {
+                        scoresList.push(childSnapshot.val());
+                    });
+
+                    // Sort descending by score
+                    scoresList.sort((a, b) => b.score - a.score);
+
+                    if (scoresList.length === 0) {
+                        tbody.innerHTML = `<tr><td colspan="3">No scores recorded yet. Be the first!</td></tr>`;
+                        return;
+                    }
+
+                    scoresList.forEach((item, index) => {
+                        const tr = document.createElement("tr");
+                        tr.innerHTML = `
+                            <td>#${index + 1}</td>
+                            <td>${escapeHtml(item.name)}</td>
+                            <td><strong>${item.score}</strong> / 100</td>
+                        `;
+                        tbody.appendChild(tr);
+                    });
+                });
+            }
+        }
+
+        function escapeHtml(text) {
+            return text.replace(/[&<>"']/g, function(m) { return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'})[m]; });
         }
 
         function restartQuiz() {
             currentIndex = 0;
             score = 0;
             scoreTrackerEl.innerText = "Score: 0";
-            document.getElementById("result-screen").style.display = "none";
-            document.getElementById("quiz-screen").style.display = "block";
-            loadQuestion();
+            resultScreen.classList.remove("active");
+            startScreen.classList.add("active");
         }
-
-        // Initialize Quiz
-        loadQuestion();
     </script>
 </body>
 </html>
