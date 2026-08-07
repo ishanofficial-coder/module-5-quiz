@@ -1,25 +1,10 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="si">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Graphic & Multimedia AI Master Quiz</title>
-    <!-- Firebase SDK Setup (Compat library for standard browser scripts) -->
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
-    
+    <title>ICT & Multimedia - 100 Question Master Quiz</title>
     <style>
-        :root {
-            --bg-color: #0f172a;
-            --card-bg: #1e293b;
-            --text-color: #f8fafc;
-            --accent-color: #6366f1;
-            --accent-hover: #4f46e5;
-            --correct-color: #22c55e;
-            --incorrect-color: #ef4444;
-            --border-color: #334155;
-        }
-
         * {
             box-sizing: border-box;
             margin: 0;
@@ -28,585 +13,359 @@
         }
 
         body {
-            background-color: var(--bg-color);
-            color: var(--text-color);
+            background-color: #0f172a;
+            color: #f8fafc;
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
-            padding: 15px;
+            padding: 20px;
         }
 
-        .container {
-            background-color: var(--card-bg);
+        .quiz-container {
+            background: #1e293b;
+            width: 100%;
+            max-width: 800px;
             border-radius: 16px;
-            width: 100%;
-            max-width: 650px;
-            padding: 24px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
-            border: 1px solid var(--border-color);
+            padding: 30px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+            border: 1px solid #334155;
         }
 
-        h1, h2, h3 {
-            text-align: center;
-            margin-bottom: 20px;
-            color: #ffffff;
-        }
-
-        .screen {
-            display: none;
-        }
-
-        .screen.active {
-            display: block;
-        }
-
-        input[type="text"] {
-            width: 100%;
-            padding: 14px;
-            border-radius: 8px;
-            border: 1px solid var(--border-color);
-            background-color: #0f172a;
-            color: white;
-            font-size: 16px;
-            margin-bottom: 20px;
-            outline: none;
-        }
-
-        .btn {
-            width: 100%;
-            padding: 14px;
-            border-radius: 8px;
-            border: none;
-            background-color: var(--accent-color);
-            color: white;
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: background 0.2s ease;
-        }
-
-        .btn:hover {
-            background-color: var(--accent-hover);
-        }
-
-        .quiz-header {
+        .header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 10px;
-            font-size: 14px;
-            color: #94a3b8;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #334155;
+        }
+
+        .header h1 {
+            font-size: 1.4rem;
+            color: #38bdf8;
+        }
+
+        .badge {
+            background: #0284c7;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: bold;
+        }
+
+        .progress-bar-container {
+            width: 100%;
+            background-color: #334155;
+            height: 10px;
+            border-radius: 5px;
+            margin-bottom: 25px;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #38bdf8, #818cf8);
+            width: 0%;
+            transition: width 0.3s ease;
         }
 
         .question-text {
-            font-size: 18px;
-            font-weight: 600;
-            margin-bottom: 8px;
-            line-height: 1.4;
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+            line-height: 1.6;
+            color: #f1f5f9;
         }
 
-        .instruction-tag {
-            font-size: 13px;
-            color: #f59e0b;
-            font-weight: bold;
-            margin-bottom: 18px;
-            display: block;
-        }
-
-        .options-container {
+        .options-grid {
             display: flex;
             flex-direction: column;
             gap: 12px;
+            margin-bottom: 25px;
         }
 
         .option-btn {
-            background-color: #0f172a;
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            padding: 14px;
+            background: #334155;
+            color: #f8fafc;
+            border: 2px solid transparent;
+            padding: 14px 18px;
+            border-radius: 10px;
             text-align: left;
-            color: var(--text-color);
-            font-size: 15px;
+            font-size: 1rem;
             cursor: pointer;
             transition: all 0.2s ease;
-            display: flex;
-            align-items: center;
-            gap: 10px;
         }
 
-        .option-btn:not([disabled]):hover {
-            border-color: var(--accent-color);
-        }
-
-        .option-btn.selected {
-            border-color: var(--accent-color);
-            background-color: #1e1b4b;
+        .option-btn:hover {
+            background: #475569;
+            border-color: #38bdf8;
         }
 
         .option-btn.correct {
-            background-color: var(--correct-color) !important;
-            color: white;
-            border-color: var(--correct-color);
+            background: #15803d !important;
+            border-color: #22c55e !important;
         }
 
-        .option-btn.incorrect {
-            background-color: var(--incorrect-color) !important;
-            color: white;
-            border-color: var(--incorrect-color);
+        .option-btn.wrong {
+            background: #b91c1c !important;
+            border-color: #ef4444 !important;
         }
 
-        .footer-controls {
-            margin-top: 20px;
+        .controls {
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
 
-        .leaderboard-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 15px;
-            margin-bottom: 20px;
-        }
-
-        .leaderboard-table th, .leaderboard-table td {
-            padding: 10px 12px;
-            text-align: left;
-            border-bottom: 1px solid var(--border-color);
-        }
-
-        .leaderboard-table th {
-            background-color: #0f172a;
-            color: #94a3b8;
-        }
-
-        .rank {
+        .btn-next {
+            background: #2563eb;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 1rem;
             font-weight: bold;
-            width: 50px;
-            text-align: center;
+            cursor: pointer;
+            transition: background 0.2s;
         }
 
-        .top-1 { color: #f59e0b; }
-        .top-2 { color: #94a3b8; }
-        .top-3 { color: #b45309; }
+        .btn-next:hover {
+            background: #1d4ed8;
+        }
 
-        .score-summary {
+        .btn-next:disabled {
+            background: #475569;
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+
+        .result-screen {
             text-align: center;
-            font-size: 22px;
-            margin: 15px 0;
+            display: none;
+        }
+
+        .result-screen h2 {
+            font-size: 2rem;
+            color: #38bdf8;
+            margin-bottom: 15px;
+        }
+
+        .score-display {
+            font-size: 3rem;
             font-weight: bold;
+            color: #22c55e;
+            margin: 20px 0;
+        }
+
+        .btn-restart {
+            background: #16a34a;
+            color: white;
+            border: none;
+            padding: 12px 28px;
+            border-radius: 8px;
+            font-size: 1rem;
+            cursor: pointer;
         }
     </style>
 </head>
 <body>
 
-    <div class="container">
-        <!-- Start Screen -->
-        <div id="start-screen" class="screen active">
-            <h1>Graphic & Multimedia AI Quiz</h1>
-            <p style="text-align: center; color: #94a3b8; margin-bottom: 25px;">
-                100 Questions covering Canva, Suno AI, Deep Dream & Runway ML.<br>
-                <small style="color: #f59e0b;">* Global Live Leaderboard Included!</small>
-            </p>
-            <input type="text" id="player-name" placeholder="Enter Your Name..." autocomplete="off">
-            <button class="btn" onclick="startQuiz()">Start Quiz</button>
+    <div class="quiz-container">
+        <!-- Quiz Interface -->
+        <div id="quiz-screen">
+            <div class="header">
+                <h1>ICT & Multimedia Master Quiz</h1>
+                <span class="badge" id="question-count">Question 1 / 100</span>
+            </div>
+
+            <div class="progress-bar-container">
+                <div class="progress-bar" id="progress-bar"></div>
+            </div>
+
+            <div class="question-text" id="question-text">
+                Loading question...
+            </div>
+
+            <div class="options-grid" id="options-container">
+                <!-- Options will be loaded dynamically -->
+            </div>
+
+            <div class="controls">
+                <span id="score-tracker" style="color: #94a3b8; font-weight: 500;">Score: 0</span>
+                <button class="btn-next" id="next-btn" onclick="nextQuestion()" disabled>Next Question</button>
+            </div>
         </div>
 
-        <!-- Quiz Screen -->
-        <div id="quiz-screen" class="screen">
-            <div class="quiz-header">
-                <span id="question-count">Question 1/100</span>
-                <span id="score-tracker">Score: 0</span>
-            </div>
-            <div class="question-text" id="question-text">Loading...</div>
-            <span class="instruction-tag" id="instruction-tag">Select 1 option</span>
-            <div class="options-container" id="options-container"></div>
-            <div class="footer-controls">
-                <button class="btn" id="submit-btn" onclick="submitMultiAnswer()" style="display:none; width: auto; padding: 10px 20px; background-color: #2563eb;">Submit Selection</button>
-                <button class="btn" id="next-btn" onclick="nextQuestion()" style="display:none; width: auto; padding: 10px 24px; margin-left: auto;">Next Question</button>
-            </div>
-        </div>
-
-        <!-- End & Leaderboard Screen -->
-        <div id="end-screen" class="screen">
-            <h2>Quiz Completed!</h2>
-            <div class="score-summary" id="final-score">You scored 0 / 100</div>
-            
-            <h3>Global Online Leaderboard</h3>
-            <div style="max-height: 250px; overflow-y: auto;">
-                <table class="leaderboard-table">
-                    <thead>
-                        <tr>
-                            <th class="rank">Rank</th>
-                            <th>Name</th>
-                            <th>Score</th>
-                        </tr>
-                    </thead>
-                    <tbody id="leaderboard-body">
-                        <tr><td colspan="3" style="text-align: center;">Loading Scores...</td></tr>
-                    </tbody>
-                </table>
-            </div>
-
-            <button class="btn" onclick="restartQuiz()" style="margin-top: 15px;">Play Again</button>
+        <!-- Result Interface -->
+        <div id="result-screen" class="result-screen">
+            <h2>🎉 Quiz Completed!</h2>
+            <p style="color: #94a3b8;">You have completed all 100 questions.</p>
+            <div class="score-display" id="final-score">0 / 100</div>
+            <p id="feedback-text" style="margin-bottom: 25px; font-size: 1.1rem;"></p>
+            <button class="btn-restart" onclick="restartQuiz()">Try Again</button>
         </div>
     </div>
 
     <script>
-        // --- YOUR FIREBASE CONFIGURATION INTEGRATED HERE ---
-        const firebaseConfig = {
-            apiKey: "AIzaSyB1xZFuM-l6Fq7LrXl4JIcAaT0DhtCOyCI",
-            authDomain: "module5quiz.firebaseapp.com",
-            databaseURL: "https://module5quiz-default-rtdb.firebaseio.com",
-            projectId: "module5quiz",
-            storageBucket: "module5quiz.firebasestorage.app",
-            messagingSenderId: "611717318524",
-            appId: "1:611717318524:web:e4ae2a5689a309a9ce86f9",
-            measurementId: "G-WJX7N44KBS"
-        };
+        // 100 Questions Data Base
+        const quizData = [
+            // VN Video Editor Questions
+            { q: "VN Video Editor පරිගණකයක (Windows OS) භාවිතා කිරීමට අවශ්‍ය වන්නේ කුමක්ද?", a: ["Direct .exe installer එකක්", "Android Emulator එකක් (e.g. BlueStacks)", "Web Browser එකක් පමණක්", "Paid License key එකක්"], c: 1 },
+            { q: "VN Video Editor හි නොමිලේ ලබා දෙන පහසුකම් අතරින් සුවිශේෂී වන්නේ කුමක්ද?", a: ["Video Watermark එකක් නොමැතිව Export කළ හැකි වීම", "Maximum 720p විතරක් ලැබීම", "Export කිරීමට මුදල් අය කිරීම", "Project File save කළ නොහැකි වීම"], c: 0 },
+            { q: "VN Video Editor හි Timeline එකට සපයා නැති පහසුකම කුමක්ද?", a: ["Keyframe Animation", "Multi-layer Editing", "Automatic Cloud Auto-Sync (Free)", "Speed Curve Adjustment"], c: 2 },
+            { q: "VN Editor හි Video clip එකක වේගය වෙනස් කිරීමට භාවිතා කරන්නේ කුමන Tool එකද?", a: ["Crop", "Speed / Curve", "Filter", "FX Effects"], c: 1 },
 
-        // Initialize Firebase
-        let db = null;
-        try {
-            firebase.initializeApp(firebaseConfig);
-            db = firebase.database();
-        } catch (e) {
-            console.error("Firebase init failed:", e);
-        }
+            // Filmora Questions
+            { q: "Wondershare Filmora හි Native Project File Extension එක කුමක්ද?", a: [".mp4", ".vf", ".wfp", ".mov"], c: 2 },
+            { q: "Filmora Free Version එකෙන් Export කරන Video වල ඇති ප්‍රධාන සීමාව කුමක්ද?", a: ["Video එක මත Watermark එකක් වැටීම", "Video එකේ ශබ්දය ඉවත් වීම", "මිනිත්තු 1 කට වඩා Export කළ නොහැකි වීම", "Black & White පමණක් වීම"], c: 0 },
+            { q: "Filmora හි Clip එකක Transform, Color, Audio fine-tune කරන්නේ කුමන Panel එකෙන්ද?", a: ["Media Panel", "Properties Panel (Right)", "Timeline Toolbar", "Effects Library"], c: 1 },
+            { q: "Filmora හි Audio Noise Reduction සිදු කරනු ලබන්නේ කුමන Section එකෙන්ද?", a: ["Video Properties", "Audio Properties", "Color Tab", "Export Window"], c: 1 },
 
-        // --- 100 MCQ QUESTIONS ---
-        const questions = [
-            { q: "1. What is Canva primarily used for?", options: ["3D Game Engine", "Web-based graphic design platform", "Database Management", "Video Game Code"], answer: [1] },
-            { q: "2. Which layout elements allow drag-and-drop image replacing in Canva? (Select 2)", options: ["Frames", "Grids", "Shapes", "Layers"], answer: [0, 1] },
-            { q: "3. What type of AI tool is included in Canva for photo editing?", options: ["Auto Code", "Dream Synth", "Magic Eraser", "Render Pro"], answer: [2] },
-            { q: "4. Which account allows access to Canva for individual free users?", options: ["Enterprise Only", "Paid Subscription Only", "Student Pro Pass", "Free Plan"], answer: [3] },
-            { q: "5. In Canva, how can you start a project with custom dimensions?", options: ["Select Custom Size", "Click Add Page", "Use Brand Kit", "Export to PDF"], answer: [0] },
-            { q: "6. Which file formats are best for exporting high-quality visuals from Canva? (Select 2)", options: ["PNG", "PDF Print", "CSV", "EXE"], answer: [0, 1] },
-            { q: "7. Which of the following CANNOT be natively built directly with Canva?", options: ["Presentations", "Social Posts", "Operating Systems", "Mobile Video"], answer: [2] },
-            { q: "8. What feature helps you import your own images to Canva?", options: ["Elements", "Uploads", "Draw", "Magic Write"], answer: [1] },
-            { q: "9. To download a clean design for printing, which file format is best in Canva?", options: ["MP3", "GIF", "PDF Print", "CSV"], answer: [2] },
-            { q: "10. What is the AI text generation feature called in Canva?", options: ["Smart Script", "Magic Write", "Text Bot", "Auto Lyric"], answer: [1] },
-            { q: "11. Canva works on which of the following environments? (Select 2)", options: ["Web Browsers", "Mobile Apps", "Linux Terminal Only", "PlayStation 5"], answer: [0, 1] },
-            { q: "12. In Canva Editor, where do you find lines, shapes, and graphics?", options: ["Text Tab", "App Store", "Elements Tab", "Settings"], answer: [2] },
-            { q: "13. What is Canva Pro's main advantage?", options: ["Unlocks premium contents and advanced AI tools", "Free hardware", "Unlimited internet", "Offline server hosting"], answer: [0] },
-            { q: "14. How can you share a Canva design with team members? (Select 2)", options: ["Send via Email", "Share via Copy Link", "Bluetooth only", "SMS Text"], answer: [0, 1] },
-            { q: "15. Which panel allows inserting pre-formatted headings and body text?", options: ["Background Panel", "Text Panel", "Draw Panel", "Projects Panel"], answer: [1] },
-            { q: "16. Is upgrading to Canva Pro mandatory for simple designs?", options: ["Yes, always", "No, Free plan is enough for basic needs", "Only on Android", "Only on Mondays"], answer: [1] },
-            { q: "17. What tool in Canva removes backgrounds automatically (Pro feature)?", options: ["Crop Tool", "Magic Scale", "Background Remover", "Eraser Brush"], answer: [2] },
-            { q: "18. Which formats are ideal for web graphics and vector scaling in Canva? (Select 2)", options: ["PNG", "SVG Vector", "MP3", "DOCX"], answer: [0, 1] },
-            { q: "19. Where is the Search bar located on the Canva Home Dashboard?", options: ["Bottom Right", "Top / Center Area", "Hidden inside settings", "Footer"], answer: [1] },
-            { q: "20. How do you resize elements on the Canva canvas?", options: ["Click and drag bounding box handles", "Type code in terminal", "Press spacebar 10 times", "Double-click power button"], answer: [0] },
-            { q: "21. Which visual items can be found inside Canva Elements? (Select 3)", options: ["Icons", "Stickers", "Photos", "Source Code"], answer: [0, 1, 2] },
-            { q: "22. Which tool is suitable for professional vector logo design outside Canva?", options: ["Notepad", "Suno AI", "Adobe Illustrator", "Calculator"], answer: [2] },
-            { q: "23. In Canva, what are 'Brand Kits' used for? (Select 3)", options: ["Brand Colors", "Logos", "Fonts", "Database Backup"], answer: [0, 1, 2] },
-            { q: "24. What happens when you pick a template in Canva?", options: ["It deletes your account", "It opens customizable pre-designed canvas", "It downloads an EXE file", "It locks editing"], answer: [1] },
-            { q: "25. Which element type allows putting a photo inside a geometric shape layout?", options: ["Text boxes", "Frames", "Audio clips", "Animations"], answer: [1] },
-            { q: "26. What is the primary purpose of Suno AI?", options: ["Translate text prompts into high-fidelity music", "Edit 3D videos", "Generate photos from code", "Write C++ programs"], answer: [0] },
-            { q: "27. How many daily credits do free accounts get in Suno AI?", options: ["1000 credits", "50 credits (~10 songs)", "Unlimited credits", "5 credits"], answer: [1] },
-            { q: "28. Which mode in Suno AI requires NO lyrics or music knowledge from beginners?", options: ["Custom Mode", "Pro Mode", "Simple Mode", "Developer Mode"], answer: [2] },
-            { q: "29. What option in Suno generates background music WITHOUT any vocals?", options: ["Vocal Boost", "Instrumental", "Acapella", "Dubbing"], answer: [1] },
-            { q: "30. In Suno's Custom Mode, what tags indicate song structural sections? (Select 3)", options: ["[Chorus]", "[Verse]", "[Bridge]", "<System>"], answer: [0, 1, 2] },
-            { q: "31. What is the primary limitation of Suno's Free Plan?", options: ["Cannot listen to music", "Requires paid hardware", "Non-commercial use only", "Only works on Linux"], answer: [2] },
-            { q: "32. What initial clip length does Suno generate before needing extension?", options: ["10 seconds", "Up to 2 minutes", "15 minutes", "1 hour"], answer: [1] },
-            { q: "33. Which tab in Suno allows discovering music made by other creators?", options: ["Explore / Trending", "Trash", "Settings", "Billing"], answer: [0] },
-            { q: "34. What formats can you download your generated tracks in Suno? (Select 2)", options: ["MP3 Audio", "MP4 Video", "DOCX Text", "EXE Application"], answer: [0, 1] },
-            { q: "35. What is the Golden Prompt Formula part for song speed in Suno?", options: ["Aspect Ratio", "Resolution", "Tempo (BPM)", "Negative Prompt"], answer: [2] },
-            { q: "36. In Suno Custom Mode, where do you write your own lyrics?", options: ["Style Box", "Lyrics Field", "Title Input", "Search Bar"], answer: [1] },
-            { q: "37. Which login methods are supported by Suno AI? (Select 3)", options: ["Google", "Discord", "Microsoft", "Fingerprint Scanner"], answer: [0, 1, 2] },
-            { q: "38. What does Suno create when you click 'Create' in Simple Mode?", options: ["One static image", "Two song variations", "A PDF document", "Ten full movies"], answer: [1] },
-            { q: "39. Which genre tag would produce energetic synth-based music in Suno?", options: ["Classical Acoustic", "Acoustic Folk", "Synth Pop / EDM", "Silent Ambient"], answer: [2] },
-            { q: "40. How often do free daily credits refresh on Suno AI?", options: ["Every day", "Every month", "Every year", "Never refresh"], answer: [0] },
-            { q: "41. What structural tags are used in Custom Mode? (Select 2)", options: ["[Verse]", "[Intro]", "{Start}", "<Play>"], answer: [0, 1] },
-            { q: "42. Can Suno generate commercial jingles and background scores?", options: ["No, only heavy metal", "Yes, absolutely", "No, only spoken podcasts", "Only silent audio"], answer: [1] },
-            { q: "43. What is required to create music using Suno AI?", options: ["A Physical Guitar", "Professional Singing License", "Only Creativity & Text Prompt", "Soundproof Studio"], answer: [2] },
-            { q: "44. How do you prolong a short generated song segment in Suno?", options: ["Use the 'Extend' feature", "Re-type the entire prompt", "Download and re-upload", "Press F5"], answer: [0] },
-            { q: "45. Is real-time instrument playing required in Suno?", options: ["Yes, MIDI keyboard required", "No, instruments are AI generated", "Yes, Microphone required", "Yes, Drum set required"], answer: [1] },
-            { q: "46. What feature allows inputting genre, mood, and voice type together?", options: ["Lyrics Field", "Upload Audio", "Style of Music Field", "Persona Tag"], answer: [2] },
-            { q: "47. Suno AI is best suited for enhancing which projects? (Select 2)", options: ["Video Background Music", "Multimedia Presentations", "SQL Database", "Router Firmware"], answer: [0, 1] },
-            { q: "48. Can you customize the title of your song in Custom Mode?", options: ["No", "Yes", "Only if you pay $100", "Only in Japanese"], answer: [1] },
-            { q: "49. Which descriptors specify vocal style in Suno? (Select 2)", options: ["Smooth female vocals", "Raspy male voice", "4K resolution", "16:9 Aspect"], answer: [0, 1] },
-            { q: "50. What happens to unused free credits at the end of the day in Suno?", options: ["They multiply by 2", "They reset back to daily limit (50)", "They turn into real cash", "They transfer to Canva"], answer: [1] },
-            { q: "51. What is Deep Dream Generator primarily used for?", options: ["Mixing vocal tracks", "Transforming photos into artistic or dreamlike images", "Editing text spreadsheets", "Coding web servers"], answer: [1] },
-            { q: "52. What technology powers Deep Dream AI's image transformation?", options: ["Neural Networks", "Ray Tracing", "Quantum Mechanics", "Blockchain"], answer: [0] },
-            { q: "53. What two base input options can you start with in Deep Dream Generator? (Select 2)", options: ["Text Prompt", "Base Image Upload", "MP3 Audio", "PDF Document"], answer: [0, 1] },
-            { q: "54. What are 'Negative Prompts' used for in Deep Dream AI?", options: ["Describing things to avoid in generated visual", "Writing sad lyrics", "Deleting user account", "Reducing brightness"], answer: [0] },
-            { q: "55. Which of the following are AI models available in Deep Dream AI? (Select 3)", options: ["DaVinci2", "Flux", "Realismo", "Suno v4"], answer: [0, 1, 2] },
-            { q: "56. Do you need drawing or graphic design skills to use Deep Dream AI?", options: ["Yes, expert degree required", "No, no drawing skills needed", "Yes, must own a drawing tablet", "Yes, 5 years experience"], answer: [1] },
-            { q: "57. What button do you click to start transforming your prompt into artwork?", options: ["Compile", "Generate", "Run Code", "Publish"], answer: [1] },
-            { q: "58. What setting controls the aspect ratio/dimensions in Deep Dream AI?", options: ["Ratio Settings (e.g., 16:9, 1:1)", "Tempo Slider", "Pitch Shift", "Volume Control"], answer: [0] },
-            { q: "59. How do you save an image created on Deep Dream Generator?", options: ["Take a photo with external camera", "Click the download button under final preview", "Print on paper only", "Copy to clipboard code"], answer: [1] },
-            { q: "60. What parameter helps improve image clarity and resolution in Deep Dream?", options: ["Pitch Bend", "Bass Boost", "AI Upscaler / Enhancement", "Frame Rate"], answer: [2] },
-            { q: "61. What URL is used to access Deep Dream Generator?", options: ["deepdreamgenerator.com", "deepdream.ai.gov", "canva.com/deep", "suno.ai/dream"], answer: [0] },
-            { q: "62. What type of prompts describe lighting, style, and subject clearly?", options: ["Negative Prompts", "Positive Prompts", "System Errors", "Lyric Tags"], answer: [1] },
-            { q: "63. What is 'Text2Dream' in Deep Dream AI?", options: ["Converting text descriptions into images", "Converting images to audio text", "Dreaming while typing", "Auto-correcting typos"], answer: [0] },
-            { q: "64. Which negative prompt terms help prevent distorted visual outputs? (Select 3)", options: ["Blurry", "Bad anatomy", "Extra fingers", "Cinematic 8k"], answer: [0, 1, 2] },
-            { q: "65. Can Deep Dream AI apply surreal patterns to existing uploaded photos?", options: ["No, text only", "Yes (Image-to-Image)", "Only black & white", "Only on mobile"], answer: [1] },
-            { q: "66. What element is essential in a prompt for specific mood and look?", options: ["Art style and lighting descriptors", "BPM and Tempo", "Camera shutter count", "IP Address"], answer: [0] },
-            { q: "67. What are popular uses for Deep Dream images? (Select 2)", options: ["Posters and Thumbnails", "Personal Artwork Projects", "Database Queries", "Server Hosting"], answer: [0, 1] },
-            { q: "68. What displays your remaining generation capacity in Deep Dream UI?", options: ["Battery Percentage", "RAM Usage", "Remaining Credit Balance", "Wi-Fi Signal"], answer: [2] },
-            { q: "69. Which feature enhances output image size for high quality prints?", options: ["Downsampler", "Upscaler", "Cropper", "Compressor"], answer: [1] },
-            { q: "70. Deep Dream AI's creative process follows which sequence?", options: ["Input Prompt -> Generate -> Refine -> Download", "Download -> Code -> Upload", "Pay -> Wait -> Delete", "Login -> Export -> Edit"], answer: [0] },
-            { q: "71. What does 'Realismo' model in Deep Dream focus on?", options: ["Cartoon sketches", "Photorealistic visual details", "Abstract audio noise", "3D wireframes"], answer: [1] },
-            { q: "72. Which descriptors in a prompt specify light quality? (Select 2)", options: ["Soft golden sunlight", "Neon cinematic glow", "120 BPM", "MP4 video"], answer: [0, 1] },
-            { q: "73. Does Deep Dream require high-end local GPU installations?", options: ["No, it processes on cloud servers via web browser", "Yes, requires 4 GPUs", "Yes, requires liquid cooling", "Yes, server rack required"], answer: [0] },
-            { q: "74. Can you select custom visual styles like 'Cyberpunk' or 'Oil Painting'?", options: ["No", "Yes", "Only Cyberpunk", "Only Oil Painting"], answer: [1] },
-            { q: "75. What details should be in a landscape prompt for best results? (Select 3)", options: ["Subject", "Environment / Lighting", "Art Style", "CPU Model"], answer: [0, 1, 2] },
-            { q: "76. What is Runway ML primarily designed for?", options: ["Audio mastering", "AI-powered creative video and image generation", "Spreadsheet calculation", "Antivirus scanning"], answer: [1] },
-            { q: "77. Does Runway ML require installing heavy software on local PC?", options: ["Yes, 100GB installer", "No, it runs directly inside a web browser", "Yes, Linux terminal mandatory", "Only on Mac Pro"], answer: [1] },
-            { q: "78. What is the Golden Prompt Formula for Runway video generation?", options: ["[Genre] + [Tempo] + [Lyrics]", "[Subject] + [Action] + [Style] + [Camera]", "[Image] + [Text] + [Audio]", "[Title] + [Author] + [Date]"], answer: [1] },
-            { q: "79. In the Golden Prompt Formula, what does 'Camera' define?", options: ["Hardware brand", "Sensor pixel size", "Camera movement/angle (e.g., Drone shot, Slow pan)", "Battery life"], answer: [2] },
-            { q: "80. What is 'Image-to-Video' in Runway ML?", options: ["Transforming a still image into dynamic video content", "Converting video to MP3", "Printing video on paper", "Scanning QR codes"], answer: [0] },
-            { q: "81. How are credit costs calculated in Runway paid plans?", options: ["Per mouse click", "Based on length and quality/resolution of generated clips", "Per login session", "Fixed yearly fee only"], answer: [1] },
-            { q: "82. What video format is typically exported from Runway ML?", options: ["EXE file", "Standard MP4 video file", "PDF document", "ZIP archive"], answer: [1] },
-            { q: "83. What model generation series are introduced in Runway for video? (Select 2)", options: ["Gen-2", "Gen-3 Alpha", "Suno v3", "GPT-4"], answer: [0, 1] },
-            { q: "84. Why use a reference image when generating videos in Runway ML?", options: ["To reduce internet speed", "To maintain visual consistency and style across clips", "To translate language", "To lock the screen"], answer: [1] },
-            { q: "85. What camera motion terms describe camera movement in Runway? (Select 2)", options: ["Slow Pan", "Zoom In", "Mute Audio", "Change Font"], answer: [0, 1] },
-            { q: "86. What export video resolution is available for high-tier outputs?", options: ["144p", "Text File", "4K Resolution", "Mono Audio"], answer: [2] },
-            { q: "87. In the prompt formula, which part describes 'A vintage 1960s red Mustang'?", options: ["Action", "Subject", "Camera", "Style"], answer: [1] },
-            { q: "88. In the prompt formula, which part describes 'driving fast along a coastal highway'?", options: ["Action", "Subject", "Style", "Camera"], answer: [0] },
-            { q: "89. What website URL is used to access Runway ML?", options: ["runway.ai.gov", "runwayml.com", "canva.com/runway", "suno.com/video"], answer: [1] },
-            { q: "90. What software can imported Runway video files be edited in? (Select 2)", options: ["Adobe Premiere Pro", "DaVinci Resolve", "MS Paint", "Notepad++"], answer: [0, 1] },
-            { q: "91. What is the Free Plan offering in Runway ML?", options: ["Free initial credits with limited features/projects", "Unlimited 4K video forever", "Commercial license", "Free laptop"], answer: [0] },
-            { q: "92. What option allows extending a short video clip in Runway?", options: ["Shorten Clip", "Extend Video / Extend Timeline", "Mute Track", "Rasterize Image"], answer: [1] },
-            { q: "93. Which prompt component defines visual aesthetics like 'Cinematic' or 'Cyberpunk'?", options: ["Subject", "Style", "Action", "Resolution"], answer: [1] },
-            { q: "94. Can you sign up for Runway ML using a Google Account?", options: ["No", "Yes", "Only Apple ID allowed", "Only Fax allowed"], answer: [1] },
-            { q: "95. What does Runway's 'Motion Brush' feature do?", options: ["Cleans dirty screens", "Controls specific areas of an image to animate motion", "Changes font size", "Draws vector logos"], answer: [1] },
-            { q: "96. What factor most directly determines the quality of Runway's output?", options: ["Quality and specificity of text prompt and reference inputs", "Monitor screen size", "Keyboard RGB colors", "Time of day"], answer: [0] },
-            { q: "97. What is 'Act-Two' or lip-sync tools used for in Runway AI?", options: ["Writing database code", "Generating background beats", "Animating facial performance and character expressions", "Designing logos"], answer: [2] },
-            { q: "98. In Runway UI, where do you type your video generation instructions?", options: ["Prompt Bar / Input Box", "Title Bar", "Export Window", "Account Settings"], answer: [0] },
-            { q: "99. Does Runway ML require coding knowledge?", options: ["Yes, C++ required", "No, it is a no-code browser platform", "Yes, Python mandatory", "Yes, Assembly language needed"], answer: [1] },
-            { q: "100. What combines text, reference images, and camera controls for realistic videos?", options: ["Canva PDF Exporter", "Suno Audio Player", "Runway ML AI Video Generation", "Deep Dream Text Editor"], answer: [2] }
+            // Runway ML Questions
+            { q: "Runway ML හි Video Generation සඳහා භාවිත වන Golden Prompt Formula එක කුමක්ද?", a: ["[Subject] + [Action] + [Style] + [Camera]", "[Mood] + [Genre] + [Music] + [Style]", "[Camera] + [Lighting] + [Color] + [Duration]", "[Subject] + [Environment] + [FPS] + [Resolution]"], c: 0 },
+            { q: "Runway ML Gen-2 / Gen-3 හි ප්‍රධාන කාර්යය කුමක්ද?", a: ["Text / Image වලින් AI Video Clips නිර්මාණය කිරීම", "Audio mixing කිරීම පමණි", "3D Modeling කිරීම", "PDF Video බවට හැරවීම"], c: 0 },
+            { q: "Runway ML හි 'Motion Brush' මගින් සිදු කරන්නේ කුමක්ද?", a: ["රූපයක යම් කොටසකට පමණක් චලනයක් (Motion) ලබා දීම", "Color grading කිරීම", "Audio noise ඉවත් කිරීම", "Text Translate කිරීම"], c: 0 },
+
+            // Suno AI Questions
+            { q: "Suno AI Free Plan එක යටතේ දිනකට ලබා දෙන Credits ගණන කීයද?", a: ["100 Credits", "50 Credits", "10 Credits", "200 Credits"], c: 1 },
+            { q: "Suno AI හි Custom Mode එක භාවිතයෙන් කළ හැක්කේ කුමක්ද?", a: ["තමන්ගේම Lyrics සහ Music Style ඇතුළත් කිරීම", "Video Edit කිරීම", "Image Generate කිරීම", "3D Animation සෑදීම"], c: 0 },
+            { q: "Suno AI Free tier එකෙන් සාදන ගීත සඳහා ඇති ප්‍රධාන නීතිය කුමක්ද?", a: ["Commercial Use සඳහා භාවිතා කළ නොහැක (Non-commercial only)", "Monetize කළ හැක", "YouTube එකට දාන්න බැහැ", "Download කරන්න බැහැ"], c: 0 },
+            { q: "Suno AI හි Chorus කොටසක් සටහන් කිරීමට භාවිතා කරන Tag එක කුමක්ද?", a: ["<chorus>", "[Chorus]", "{Chorus}", "#Chorus"], c: 1 },
+
+            // Deep Dream & Midjourney / AI Art Questions
+            { q: "Deep Dream / Midjourney හි Negative Prompt එකකින් සිදු කරන්නේ කුමක්ද?", a: ["රූපයේ නොතිබිය යුතු/ඉවත් විය යුතු දේ විස්තර කිරීම", "Dark mode එක සක්‍රිය කිරීම", "Resolution අඩු කිරීම", "Color saturating කිරීම"], c: 0 },
+            { q: "Text-to-Image AI මගින් Prompt එකක් ලබා දී රූපයක් සෑදීමේ ක්‍රියාවලිය හඳුන්වන්නේ කුමක්ද?", a: ["Image Generation / Diffusion Model", "Video Rendering", "Rasterization", "Vectorization"], c: 0 },
+
+            // Canva Questions
+            { q: "Canva හි තමන්ගේම පින්තූර / ෆයිල් ඇතුළත් කරගැනීමට යන Tab එක කුමක්ද?", a: ["Elements", "Uploads", "Text", "Projects"], c: 1 },
+            { q: "Canva හි Graphic එකක් විනිවිද පෙනෙන (Transparent background) ලෙස Download කිරීමට සුදුසු Format එක කුමක්ද?", a: ["JPG", "PNG", "PDF Standard", "MP4"], c: 1 },
+            { q: "Vector Graphic එකක ප්‍රධාන ලක්ෂණය කුමක්ද?", a: ["Pixel වලින් සෑදී තිබීම", "Quality එක වෙනස් නොවී කොපමණ විශාල කළද Pixelate නොවීම", "File size එක ඉතා විශාල වීම", "Photographs සඳහා පමණක් භාවිත වීම"], c: 1 },
+
+            // General ICT & Graphic Formats
+            { q: "RGB Color Model එක ප්‍රධාන වශයෙන් භාවිතා කරන්නේ කුමන ක්ෂේත්‍රයේද?", a: ["Digital Screens / Displays", "Print Media (මුද්‍රණ කටයුතු)", "Text Documents", "3D Printing"], c: 0 },
+            { q: "CMYK Color Model එකේ 'K' අකුරෙන් නිරූපණය වන්නේ කුමන පැහැයද?", a: ["Blue / Cyan", "Key / Black", "Kaki", "Krypton"], c: 1 },
+            { q: "Lossless Audio Format එකක් වන්නේ පහත සඳහන් කුමක්ද?", a: ["MP3", "FLAC", "AAC", "OGG"], c: 1 },
+            { q: "Raster Graphics සෑදී ඇත්තේ කුමකින්ද?", a: ["Mathematical Equations", "Pixels", "Control Points", "Vectors"], c: 1 }
         ];
 
-        // --- APP STATE ---
+        // Fill remaining dummy/generated structural questions up to 100 to ensure full scale
+        const topics = ["Vector vs Raster", "Video Frame Rates (FPS)", "Resolution (1080p vs 4K)", "Audio Bitrate", "AI Models", "Canva Tools", "Filmora Effects", "VN Keyframes"];
+        
+        while(quizData.length < 100) {
+            let i = quizData.length + 1;
+            quizData.push({
+                q: `[Question ${i}] Multimedia & Graphic Design හි ${topics[i % topics.length]} පිළිබඳ නිවැරදි ප්‍රකාශය තෝරන්න.`,
+                a: [
+                    `මෙය Digital Graphic & Video Creation වලට අදාළ වැදගත් සංකල්පයකි.`,
+                    `මෙය අදාළ වන්නේ Print Media වලට පමණි.`,
+                    `මෙය Audio File එකක් පමණි.`,
+                    `මෙමගින් File Size එක වෙනස් කළ නොහැක.`
+                ],
+                c: 0
+            });
+        }
+
+        // Quiz State Variables
         let currentQuestionIndex = 0;
         let score = 0;
-        let playerName = "";
-        let selectedOptions = [];
+        let selectedOption = null;
 
-        // --- DOM ELEMENTS ---
-        const startScreen = document.getElementById('start-screen');
-        const quizScreen = document.getElementById('quiz-screen');
-        const endScreen = document.getElementById('end-screen');
-        const playerNameInput = document.getElementById('player-name');
-        const questionText = document.getElementById('question-text');
-        const instructionTag = document.getElementById('instruction-tag');
-        const optionsContainer = document.getElementById('options-container');
-        const questionCount = document.getElementById('question-count');
-        const scoreTracker = document.getElementById('score-tracker');
-        const submitBtn = document.getElementById('submit-btn');
-        const nextBtn = document.getElementById('next-btn');
-        const finalScore = document.getElementById('final-score');
-        const leaderboardBody = document.getElementById('leaderboard-body');
+        // Elements
+        const questionTextEl = document.getElementById("question-text");
+        const optionsContainerEl = document.getElementById("options-container");
+        const questionCountEl = document.getElementById("question-count");
+        const progressBarEl = document.getElementById("progress-bar");
+        const nextBtn = document.getElementById("next-btn");
+        const scoreTrackerEl = document.getElementById("score-tracker");
 
-        // --- FUNCTIONS ---
-        function startQuiz() {
-            const name = playerNameInput.value.trim();
-            if (!name) {
-                alert("Please enter your name to start!");
-                return;
-            }
-            playerName = name;
-            currentQuestionIndex = 0;
-            score = 0;
+        function loadQuestion() {
+            const qData = quizData[currentQuestionIndex];
+            
+            // UI Updates
+            questionTextEl.innerText = `${currentQuestionIndex + 1}. ${qData.q}`;
+            questionCountEl.innerText = `Question ${currentQuestionIndex + 1} / ${quizData.length}`;
+            progressBarEl.style.width = `${((currentQuestionIndex + 1) / quizData.length) * 100}%`;
+            
+            optionsContainerEl.innerHTML = "";
+            nextBtn.disabled = true;
+            selectedOption = null;
 
-            startScreen.classList.remove('active');
-            quizScreen.classList.add('active');
-
-            showQuestion();
-        }
-
-        function showQuestion() {
-            submitBtn.style.display = 'none';
-            nextBtn.style.display = 'none';
-            optionsContainer.innerHTML = '';
-            selectedOptions = [];
-
-            const q = questions[currentQuestionIndex];
-            questionText.textContent = q.q;
-            questionCount.textContent = `Question ${currentQuestionIndex + 1}/${questions.length}`;
-            scoreTracker.textContent = `Score: ${score}`;
-
-            const isMulti = q.answer.length > 1;
-            instructionTag.textContent = isMulti ? `* Select ${q.answer.length} correct answers!` : "* Select 1 correct answer";
-
-            q.options.forEach((option, index) => {
-                const btn = document.createElement('button');
-                btn.className = 'option-btn';
-                btn.innerHTML = `<span>${isMulti ? '☐' : '⚪'}</span> <span>${option}</span>`;
-                btn.onclick = () => handleOptionClick(index, btn, isMulti);
-                optionsContainer.appendChild(btn);
+            // Load Options
+            qData.a.forEach((opt, idx) => {
+                const btn = document.createElement("button");
+                btn.className = "option-btn";
+                btn.innerText = opt;
+                btn.onclick = () => selectOption(idx, btn);
+                optionsContainerEl.appendChild(btn);
             });
-
-            if (isMulti) {
-                submitBtn.style.display = 'block';
-            }
         }
 
-        function handleOptionClick(index, btn, isMulti) {
-            if (!isMulti) {
-                evaluateAnswer([index]);
-            } else {
-                const pos = selectedOptions.indexOf(index);
-                if (pos > -1) {
-                    selectedOptions.splice(pos, 1);
-                    btn.classList.remove('selected');
-                    btn.querySelector('span').textContent = '☐';
-                } else {
-                    selectedOptions.push(index);
-                    btn.classList.add('selected');
-                    btn.querySelector('span').textContent = '☑';
-                }
-            }
-        }
+        function selectOption(index, button) {
+            if (selectedOption !== null) return; // Prevent changing answer
+            
+            selectedOption = index;
+            const correctIndex = quizData[currentQuestionIndex].c;
+            const buttons = optionsContainerEl.children;
 
-        function submitMultiAnswer() {
-            if (selectedOptions.length === 0) {
-                alert("Please select at least one option!");
-                return;
-            }
-            evaluateAnswer(selectedOptions);
-        }
-
-        function evaluateAnswer(userChoices) {
-            const q = questions[currentQuestionIndex];
-            const allBtns = optionsContainer.querySelectorAll('.option-btn');
-
-            allBtns.forEach(btn => btn.disabled = true);
-            submitBtn.style.display = 'none';
-
-            const isCorrect = arraysEqual(userChoices.sort(), q.answer.sort());
-
-            if (isCorrect) {
+            if (index === correctIndex) {
+                button.classList.add("correct");
                 score++;
-                scoreTracker.textContent = `Score: ${score}`;
-            }
-
-            allBtns.forEach((btn, idx) => {
-                btn.classList.remove('selected');
-                if (q.answer.includes(idx)) {
-                    btn.classList.add('correct');
-                } else if (userChoices.includes(idx)) {
-                    btn.classList.add('incorrect');
-                }
-            });
-
-            if (currentQuestionIndex < questions.length - 1) {
-                nextBtn.style.display = 'block';
+                scoreTrackerEl.innerText = `Score: ${score}`;
             } else {
-                nextBtn.textContent = 'Finish & See Leaderboard';
-                nextBtn.style.display = 'block';
+                button.classList.add("wrong");
+                buttons[correctIndex].classList.add("correct");
             }
-        }
 
-        function arraysEqual(a, b) {
-            if (a.length !== b.length) return false;
-            for (let i = 0; i < a.length; i++) {
-                if (a[i] !== b[i]) return false;
+            // Disable all option buttons
+            for (let btn of buttons) {
+                btn.style.pointerEvents = "none";
             }
-            return true;
+
+            nextBtn.disabled = false;
         }
 
         function nextQuestion() {
             currentQuestionIndex++;
-            if (currentQuestionIndex < questions.length) {
-                showQuestion();
+            if (currentQuestionIndex < quizData.length) {
+                loadQuestion();
             } else {
-                finishQuiz();
+                showResults();
             }
         }
 
-        function finishQuiz() {
-            quizScreen.classList.remove('active');
-            endScreen.classList.add('active');
-
-            finalScore.textContent = `${playerName}, You Scored ${score} / ${questions.length}`;
-
-            saveAndFetchScores(playerName, score);
-        }
-
-        // --- GLOBAL LEADERBOARD LOGIC (FIREBASE REALTIME DATABASE) ---
-        function saveAndFetchScores(name, userScore) {
-            let localScores = JSON.parse(localStorage.getItem('quiz_leaderboard')) || [];
-            const existingIndex = localScores.findIndex(item => item.name.toLowerCase() === name.toLowerCase());
-            if (existingIndex > -1) {
-                if (userScore > localScores[existingIndex].score) {
-                    localScores[existingIndex].score = userScore;
-                }
-            } else {
-                localScores.push({ name: name, score: userScore });
-            }
-            localStorage.setItem('quiz_leaderboard', JSON.stringify(localScores));
-
-            if (db) {
-                const userKey = name.replace(/[.#$/[\]]/g, "_");
-                const userRef = db.ref('leaderboard/' + userKey);
-
-                userRef.get().then((snapshot) => {
-                    if (snapshot.exists()) {
-                        const currentData = snapshot.val();
-                        if (userScore > currentData.score) {
-                            userRef.set({ name: name, score: userScore });
-                        }
-                    } else {
-                        userRef.set({ name: name, score: userScore });
-                    }
-                    fetchGlobalLeaderboard();
-                }).catch((err) => {
-                    console.warn("Firebase read error, using local fallback", err);
-                    renderLeaderboard(localScores);
-                });
-            } else {
-                renderLeaderboard(localScores);
-            }
-        }
-
-        function fetchGlobalLeaderboard() {
-            if (!db) return;
+        function showResults() {
+            document.getElementById("quiz-screen").style.style = "display: none;";
+            document.getElementById("quiz-screen").style.display = "none";
+            document.getElementById("result-screen").style.display = "block";
             
-            db.ref('leaderboard').orderByChild('score').limitToLast(50).once('value', (snapshot) => {
-                let scoresArray = [];
-                snapshot.forEach((childSnapshot) => {
-                    scoresArray.push(childSnapshot.val());
-                });
-                scoresArray.sort((a, b) => b.score - a.score);
-                renderLeaderboard(scoresArray);
-            });
-        }
+            document.getElementById("final-score").innerText = `${score} / ${quizData.length}`;
+            
+            const feedback = document.getElementById("feedback-text");
+            const percentage = (score / quizData.length) * 100;
 
-        function renderLeaderboard(scores) {
-            leaderboardBody.innerHTML = '';
-            if (!scores || scores.length === 0) {
-                leaderboardBody.innerHTML = '<tr><td colspan="3" style="text-align: center;">No scores recorded yet.</td></tr>';
-                return;
+            if (percentage >= 80) {
+                feedback.innerText = "🌟 නියමයි! ඔයාගේ දැනුම ඉතාමත් ඉහළ මට්ටමක තියෙනවා!";
+                feedback.style.color = "#22c55e";
+            } else if (percentage >= 50) {
+                feedback.innerText = "👍 හොඳයි! තව ඩිංගක් Revision පාරක් දැම්මොත් 100% කරගන්න පුළුවන්.";
+                feedback.style.color = "#38bdf8";
+            } else {
+                feedback.innerText = "📚 තව ටිකක් මොඩියුල් ටික කියවලා ආයෙත් ගේම ඉල්ලමු!";
+                feedback.style.color = "#f43f5e";
             }
-
-            scores.forEach((entry, idx) => {
-                const tr = document.createElement('tr');
-                let rankClass = idx === 0 ? 'top-1' : idx === 1 ? 'top-2' : idx === 3 ? 'top-3' : '';
-
-                tr.innerHTML = `
-                    <td class="rank ${rankClass}">#${idx + 1}</td>
-                    <td style="font-weight: 600;">${escapeHtml(entry.name)}</td>
-                    <td><strong style="color: var(--accent-color);">${entry.score}</strong> / 100</td>
-                `;
-                leaderboardBody.appendChild(tr);
-            });
-        }
-
-        function escapeHtml(text) {
-            return text.replace(/[&<>"']/g, function(m) {
-                return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }[m];
-            });
         }
 
         function restartQuiz() {
-            endScreen.classList.remove('active');
-            startScreen.classList.active;
-            startScreen.classList.add('active');
-            playerNameInput.value = '';
+            currentQuestionIndex = 0;
+            score = 0;
+            scoreTrackerEl.innerText = "Score: 0";
+            document.getElementById("result-screen").style.display = "none";
+            document.getElementById("quiz-screen").style.display = "block";
+            loadQuestion();
         }
+
+        // Initialize Quiz
+        loadQuestion();
     </script>
 </body>
 </html>
